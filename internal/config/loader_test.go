@@ -190,3 +190,17 @@ func TestStripJSON5PreservesStringContents(t *testing.T) {
 		require.Equal(t, float64(2), got["b"])
 	})
 }
+
+func TestStripJSON5StringEdgeCases(t *testing.T) {
+	t.Run("input ending with a string literal", func(t *testing.T) {
+		out, err := StripJSON5([]byte(`"just a string"`))
+		require.NoError(t, err)
+		require.Equal(t, `"just a string"`, string(out))
+	})
+
+	t.Run("unterminated string is left untouched", func(t *testing.T) {
+		out, err := StripJSON5([]byte(`{ a: "oops, }`))
+		require.NoError(t, err)
+		require.Equal(t, `{ "a": "oops, }`, string(out))
+	})
+}
